@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wildario</title>
+
+    <!-- ========== GOOGLE FONTS ========== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+
+    <!-- ========== FONT AWESOME ========== -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        /* ===== RESET & BASE ===== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0b0e14;
+            --bg-secondary: #131a24;
+            --bg-card: #1a2330;
+            --bg-card-hover: #222f40;
+            --text-primary: #f0f4fa;
+            --text-secondary: #a0b4cc;
+            --text-muted: #6a7f99;
+            --accent-green: #4cd9a0;
+            --accent-green-dark: #36b887;
+            --accent-gold: #f7c948;
+            --accent-gold-dark: #dba62b;
+            --accent-blue: #5b9aff;
+            --border-color: #2a3a4e;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: radial-gradient(ellipse at 20% 50%, #16212e 0%, var(--bg-primary) 70%);
+            padding: 20px 16px 40px;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-green);
+            border-radius: 10px;
+        }
+
+        /* ===== APP CONTAINER ===== */
+        .app {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: rgba(19, 26, 36, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--accent-gold);
+            font-size: 26px;
+            filter: drop-shadow(0 0 8px rgba(247, 201, 72, 0.3));
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .points-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px 8px 14px;
+            background: rgba(76, 217, 160, 0.12);
+            border: 1px solid rgba(76, 217, 160, 0.25);
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--accent-green);
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .points-display i {
+            font-size: 16px;
+            color: var(--accent-gold);
+        }
+
+        .points-display .num {
+            min-width: 28px;
+            text-align: center;
+            transition: 0.15s;
+        }
+
+        .points-display.pop .num {
+            transform: scale(1.3);
+            color: #fff;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav {
+            display: flex;
+            gap: 6px;
+            padding: 6px;
+            background: rgba(19, 26, 36, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin-bottom: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 8px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-btn i {
+            font-size: 17px;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover {
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .nav-btn.active {
+            color: #fff;
+            background: linear-gradient(135deg, rgba(76, 217, 160, 0.18), rgba(91, 154, 255, 0.12));
+            box-shadow: inset 0 0 0 1px rgba(76, 217, 160, 0.2);
+        }
+
+        .nav-btn.active i {
+            color: var(--accent-green);
+        }
+
+        .nav-btn .badge {
+            display: none;
+            font-size: 10px;
+            background: var(--accent-gold);
+            color: #0b0e14;
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .nav-btn .badge.show {
+            display: inline-block;
+        }
+
+        /* ===== TAB CONTENT ===== */
+        .tab-content {
+            display: none;
+            animation: fadeSlide 0.35s ease forwards;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: rgba(26, 35, 48, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px 24px 28px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: rgba(76, 217, 160, 0.15);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--accent-gold);
+        }
+
+        .card-sub {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* ===== INFO TAB ===== */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .info-stat {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: var(--radius-sm);
+            padding: 16px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .info-stat .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .info-stat .value {
+            font-size: 22px;
+            font-weight: 800;
+            margin-top: 2px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .info-features {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .info-features .feat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .info-features .feat i {
+            color: var(--accent-gold);
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .info-features .feat span {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ===== SHOP TAB ===== */
+        .shop-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .shop-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 18px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: var(--transition);
+        }
+
+        .shop-item:hover {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: rgba(76, 217, 160, 0.1);
+        }
+
+        .shop-item .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            background: rgba(76, 217, 160, 0.1);
+            color: var(--accent-green);
+        }
+
+        .shop-item .icon.gold {
+            background: rgba(247, 201, 72, 0.12);
+            color: var(--accent-gold);
+        }
+
+        .shop-item .icon.blue {
+            background: rgba(91, 154, 255, 0.12);
+            color: var(--accent-blue);
+        }
+
+        .shop-item .info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .shop-item .info .name {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .shop-item .info .desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .shop-item .price {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--accent-gold);
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+
+        .shop-item .price i {
+            font-size: 14px;
+        }
+
+        .shop-item .buy-btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 100px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--accent-green);
+            color: #0b0e14;
+            white-space: nowrap;
+        }
+
+        .shop-item .buy-btn:hover:not(:disabled) {
+            transform: scale(1.04);
+            box-shadow: 0 0 24px rgba(76, 217, 160, 0.3);
+        }
+
+        .shop-item .buy-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .shop-item .buy-btn.owned {
+            background: var(--text-muted);
+            color: #0b0e14;
+        }
+
+        /* ===== EARN TAB ===== */
+        .earn-hero {
+            text-align: center;
+            padding: 16px 0 8px;
+        }
+
+        .earn-hero .big-icon {
+            font-size: 72px;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            display: inline-block;
+            filter: drop-shadow(0 0 32px rgba(247, 201, 72, 0.2));
+            transition: var(--transition);
+        }
+
+        .earn-hero .big-icon.bump {
+            animation: bump 0.4s ease;
+        }
+
+        @keyframes bump {
+            0% {
+                transform: scale(1);
+            }
+            40% {
+                transform: scale(1.25) rotate(-6deg);
+            }
+            70% {
+                transform: scale(0.95) rotate(4deg);
+            }
+            100% {
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        .earn-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .earn-hero p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .earn-btn-wrap {
+            margin: 24px 0 12px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .earn-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 18px 48px;
+            border: none;
+            border-radius: 100px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
+            color: #0b0e14;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 28px rgba(247, 201, 72, 0.25);
+            width: 100%;
+            max-width: 340px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .earn-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), transparent);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .earn-btn:hover:not(:disabled)::after {
+            opacity: 1;
+        }
+
+        .earn-btn:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 40px rgba(247, 201, 72, 0.35);
+        }
+
+        .earn-btn:active:not(:disabled) {
+            transform: scale(0.96);
+        }
+
+        .earn-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .earn-btn i {
+            font-size: 24px;
+        }
+
+        .earn-cooldown {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 8px;
+            min-height: 24px;
+        }
+
+        .earn-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .earn-stats .stat {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .earn-stats .stat .num {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .earn-stats .stat .lbl {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 420px;
+        }
+
+        .toast {
+            padding: 12px 22px;
+            border-radius: var(--radius-sm);
+            background: rgba(19, 26, 36, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            pointer-events: auto;
+            animation: toastIn 0.35s ease forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .toast.success {
+            border-color: var(--accent-green);
+        }
+        .toast.success i {
+            color: var(--accent-green);
+        }
+        .toast.error {
+            border-color: #f87171;
+        }
+        .toast.error i {
+            color: #f87171;
+        }
+        .toast.info {
+            border-color: var(--accent-blue);
+        }
+        .toast.info i {
+            color: var(--accent-blue);
+        }
+
+        @keyframes toastIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.94);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .toast.out {
+            animation: toastOut 0.3s ease forwards;
+        }
+
+        @keyframes toastOut {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.94);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+                padding: 14px 16px;
+            }
+
+            .logo {
+                justify-content: center;
+                font-size: 20px;
+            }
+
+            .points-display {
+                justify-content: center;
+                padding: 6px 14px;
+                font-size: 15px;
+            }
+
+            .nav-btn {
+                font-size: 13px;
+                padding: 10px 6px;
+                gap: 5px;
+            }
+
+            .nav-btn i {
+                font-size: 15px;
+            }
+
+            .nav-btn .label {
+                display: none;
+            }
+
+            .nav-btn.active .label {
+                display: inline;
+            }
+
+            .card {
+                padding: 18px 16px 22px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .info-stat .value {
+                font-size: 18px;
+            }
+
+            .shop-item {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .shop-item .info {
+                flex: 1 1 100%;
+                order: 2;
+            }
+
+            .shop-item .icon {
+                order: 1;
+            }
+
+            .shop-item .price {
+                order: 3;
+                margin-right: auto;
+            }
+
+            .shop-item .buy-btn {
+                order: 4;
+                padding: 6px 16px;
+                font-size: 12px;
+            }
+
+            .earn-btn {
+                font-size: 17px;
+                padding: 14px 28px;
+            }
+
+            .earn-hero .big-icon {
+                font-size: 56px;
+            }
+
+            .earn-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .toast {
+                font-size: 13px;
+                padding: 10px 16px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .nav-btn .label {
+                display: none !important;
+            }
+
+            .nav-btn {
+                font-size: 14px;
+                padding: 10px 4px;
+            }
+
+            .nav-btn i {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app" id="app">
+
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <a href="/" class="logo" onclick="navigate('/')">
+                <i class="fas fa-paw"></i>
+                <span>Wildario</span>
+            </a>
+            <div class="points-display" id="pointsDisplay">
+                <i class="fas fa-star"></i>
+                <span class="num" id="pointsNum">0</span>
+            </div>
+        </header>
+
+        <!-- ===== NAVIGATION ===== -->
+        <nav class="nav" id="mainNav">
+            <button class="nav-btn active" data-tab="info" onclick="navigate('/info')">
+                <i class="fas fa-info-circle"></i>
+                <span class="label">Info</span>
+            </button>
+            <button class="nav-btn" data-tab="shop" onclick="navigate('/shop')">
+                <i class="fas fa-store"></i>
+                <span class="label">Shop</span>
+                <span class="badge" id="shopBadge">new</span>
+            </button>
+            <button class="nav-btn" data-tab="earn" onclick="navigate('/earn')">
+                <i class="fas fa-bolt"></i>
+                <span class="label">Earn</span>
+            </button>
+        </nav>
+
+        <!-- ===== TAB: INFO ===== -->
+        <section class="tab-content active" id="tab-info">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-compass"></i>
+                    Chào mừng đến Wildario
+                </div>
+                <p class="card-sub">
+                    Nền tảng phiêu lưu nơi bạn khám phá, tích luỹ điểm và
+                    nhận thưởng. Mỗi hành động đều mang lại giá trị.
+                </p>
+
+                <div class="info-grid">
+                    <div class="info-stat">
+                        <div class="label">Điểm của bạn</div>
+                        <div class="value" id="infoPoints">0</div>
+                    </div>
+                    <div class="info-stat">
+                        <div class="label">Vật phẩm đã sở hữu</div>
+                        <div class="value" id="infoItems">0</div>
+                    </div>
+                </div>
+
+                <div class="info-features">
+                    <div class="feat">
+                        <i class="fas fa-gem"></i>
+                        <span>Kiếm điểm mỗi ngày tại tab <strong>Earn</strong></span>
+                    </div>
+                    <div class="feat">
+                        <i class="fas fa-cart-shopping"></i>
+                        <span>Đổi điểm lấy vật phẩm độc quyền tại <strong>Shop</strong></span>
+                    </div>
+                    <div class="feat">
+                        <i class="fas fa-rocket"></i>
+                        <span>Mở khoá thành tích và leo hạng cùng Wildario</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TAB: SHOP ===== -->
+        <section class="tab-content" id="tab-shop">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-store"></i>
+                    Cửa hàng Wildario
+                </div>
+                <p class="card-sub">
+                    Dùng điểm để đổi lấy những vật phẩm đặc biệt.
+                </p>
+
+                <div class="shop-grid" id="shopGrid">
+                    <!-- Items will be rendered by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TAB: EARN ===== -->
+        <section class="tab-content" id="tab-earn">
+            <div class="card">
+                <div class="earn-hero">
+                    <div class="big-icon" id="earnIcon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h2>Kiếm điểm</h2>
+                    <p>Nhấn nút bên dưới để nhận điểm ngay!</p>
+                </div>
+
+                <div class="earn-btn-wrap">
+                    <button class="earn-btn" id="earnBtn">
+                        <i class="fas fa-bolt"></i>
+                        <span id="earnBtnLabel">Nhận điểm</span>
+                    </button>
+                </div>
+
+                <div class="earn-cooldown" id="earnCooldown">
+                    Sẵn sàng!
+                </div>
+
+                <div class="earn-stats">
+                    <div class="stat">
+                        <div class="num" id="totalEarned">0</div>
+                        <div class="lbl">Tổng điểm kiếm được</div>
+                    </div>
+                    <div class="stat">
+                        <div class="num" id="earnCount">0</div>
+                        <div class="lbl">Lần nhận</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================================ -->
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ===========================
+            //  STATE
+            // ===========================
+            const STATE_KEY = 'wildario_state';
+
+            const defaultState = {
+                points: 0,
+                totalEarned: 0,
+                earnCount: 0,
+                lastEarnTime: 0,
+                cooldownSeconds: 5,
+                inventory: [], // item ids
+                shopItems: [
+                    { id: 'badge', name: 'Huy hiệu Vàng', desc: 'Biểu tượng của nhà thám hiểm', price: 50,
+                        icon: 'fa-medal', iconClass: 'gold' },
+                    { id: 'skin', name: 'Giao diện Bóng Đêm', desc: 'Theme tối sang trọng', price: 100,
+                        icon: 'fa-moon', iconClass: 'blue' },
+                    { id: 'boost', name: 'Boost X2', desc: 'Tăng gấp đôi điểm trong 1 lần nhận', price: 200,
+                        icon: 'fa-bolt', iconClass: '' },
+                ]
+            };
+
+            let state = loadState();
+            let isCooldown = false;
+            let cooldownTimer = null;
+
+            // ===========================
+            //  PERSISTENCE
+            // ===========================
+            function loadState() {
+                try {
+                    const raw = localStorage.getItem(STATE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        // merge with defaults to handle new fields
+                        return { ...defaultState, ...parsed };
+                    }
+                } catch (_) { /* ignore */ }
+                return { ...defaultState };
+            }
+
+            function saveState() {
+                try {
+                    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+                } catch (_) { /* ignore */ }
+            }
+
+            // ===========================
+            //  DOM REFS
+            // ===========================
+            const $ = (sel) => document.querySelector(sel);
+            const $$ = (sel) => document.querySelectorAll(sel);
+
+            const pointsNum = $('#pointsNum');
+            const infoPoints = $('#infoPoints');
+            const infoItems = $('#infoItems');
+            const shopGrid = $('#shopGrid');
+            const earnBtn = $('#earnBtn');
+            const earnBtnLabel = $('#earnBtnLabel');
+            const earnCooldown = $('#earnCooldown');
+            const totalEarned = $('#totalEarned');
+            const earnCount = $('#earnCount');
+            const earnIcon = $('#earnIcon');
+            const shopBadge = $('#shopBadge');
+
+            // ===========================
+            //  ROUTER
+            // ===========================
+            const routes = {
+                '/': 'info',
+                '/info': 'info',
+                '/shop': 'shop',
+                '/earn': 'earn',
+            };
+
+            let currentTab = 'info';
+
+            function navigate(path) {
+                // normalise
+                if (!path.startsWith('/')) path = '/' + path;
+                const tab = routes[path] || 'info';
+                switchTab(tab);
+                // Update URL without full reload
+                if (window.history && window.history.pushState) {
+                    window.history.pushState({ tab }, '', path);
+                }
+            }
+
+            function switchTab(tab) {
+                currentTab = tab;
+
+                // Update nav buttons
+                $$('.nav-btn').forEach(btn => {
+                    const t = btn.dataset.tab;
+                    btn.classList.toggle('active', t === tab);
+                });
+
+                // Update tab content
+                $$('.tab-content').forEach(el => {
+                    el.classList.toggle('active', el.id === 'tab-' + tab);
+                });
+
+                // Refresh dynamic content
+                if (tab === 'shop') renderShop();
+                if (tab === 'info') updateInfoStats();
+                if (tab === 'earn') updateEarnStats();
+
+                // Hide shop badge
+                shopBadge.classList.remove('show');
+
+                // Scroll to top of tab
+                const activeEl = document.querySelector('.tab-content.active');
+                if (activeEl) {
+                    activeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            // ===========================
+            //  POINTS UI
+            // ===========================
+            function updatePointsUI() {
+                const val = state.points;
+                pointsNum.textContent = val;
+                if (infoPoints) infoPoints.textContent = val;
+                // also update shop buttons
+                renderShop();
+                updateEarnStats();
+                updateInfoStats();
+
+                // pop animation
+                pointsNum.parentElement.classList.remove('pop');
+                void pointsNum.parentElement.offsetWidth;
+                pointsNum.parentElement.classList.add('pop');
+            }
+
+            function updateInfoStats() {
+                if (infoItems) {
+                    infoItems.textContent = state.inventory.length;
+                }
+                if (infoPoints) {
+                    infoPoints.textContent = state.points;
+                }
+            }
+
+            function updateEarnStats() {
+                totalEarned.textContent = state.totalEarned;
+                earnCount.textContent = state.earnCount;
+            }
+
+            // ===========================
+            //  SHOP
+            // ===========================
+            function renderShop() {
+                if (!shopGrid) return;
+                const items = state.shopItems;
+                let html = '';
+                for (const item of items) {
+                    const owned = state.inventory.includes(item.id);
+                    const canBuy = !owned && state.points >= item.price;
+                    const priceStr = item.price + ' ';
+
+                    html += `
+                        <div class="shop-item" data-id="${item.id}">
+                            <div class="icon ${item.iconClass || ''}">
+                                <i class="fas ${item.icon}"></i>
+                            </div>
+                            <div class="info">
+                                <div class="name">${item.name}</div>
+                                <div class="desc">${item.desc}</div>
+                            </div>
+                            <div class="price">
+                                <i class="fas fa-star"></i> ${priceStr}
+                            </div>
+                            <button class="buy-btn ${owned ? 'owned' : ''}" 
+                                    data-id="${item.id}"
+                                    ${!canBuy && !owned ? 'disabled' : ''}>
+                                ${owned ? 'Đã sở hữu' : 'Mua ngay'}
+                            </button>
+                        </div>
+                    `;
+                }
+                shopGrid.innerHTML = html;
+
+                // Attach buy events
+                shopGrid.querySelectorAll('.buy-btn').forEach(btn => {
+                    if (btn.classList.contains('owned')) return;
+                    btn.addEventListener('click', function(e) {
+                        const id = this.dataset.id;
+                        buyItem(id);
+                    });
+                });
+            }
+
+            function buyItem(id) {
+                const item = state.shopItems.find(i => i.id === id);
+                if (!item) return;
+                if (state.inventory.includes(id)) {
+                    toast('Bạn đã sở hữu vật phẩm này rồi!', 'info');
+                    return;
+                }
+                if (state.points < item.price) {
+                    toast('Không đủ điểm! Hãy kiếm thêm ở tab Earn.', 'error');
+                    return;
+                }
+
+                // Deduct points
+                state.points -= item.price;
+                state.inventory.push(id);
+                saveState();
+                updatePointsUI();
+                renderShop();
+                toast(`🎉 Bạn đã mua "${item.name}" thành công!`, 'success');
+            }
+
+            // ===========================
+            //  EARN
+            // ===========================
+            function earnPoints() {
+                if (isCooldown) return;
+
+                const now = Date.now();
+                const elapsed = (now - state.lastEarnTime) / 1000;
+                if (elapsed < state.cooldownSeconds) {
+                    const remaining = Math.ceil(state.cooldownSeconds - elapsed);
+                    toast(`Vui lòng đợi ${remaining}s trước khi nhận tiếp.`, 'info');
+                    return;
+                }
+
+                // Calculate points (base 1-5 random, with boost if owned)
+                let basePoints = Math.floor(Math.random() * 5) + 1;
+                const hasBoost = state.inventory.includes('boost');
+                if (hasBoost) {
+                    basePoints *= 2;
+                }
+
+                state.points += basePoints;
+                state.totalEarned += basePoints;
+                state.earnCount += 1;
+                state.lastEarnTime = now;
+                saveState();
+
+                // UI feedback
+                updatePointsUI();
+                updateEarnStats();
+
+                // Bump icon
+                earnIcon.classList.remove('bump');
+                void earnIcon.offsetWidth;
+                earnIcon.classList.add('bump');
+
+                // Show points earned
+                toast(`+${basePoints} điểm! ${hasBoost ? '⚡ Boost X2!' : ''}`, 'success');
+
+                // Start cooldown
+                startCooldown();
+            }
+
+            function startCooldown() {
+                if (isCooldown) return;
+                isCooldown = true;
+                earnBtn.disabled = true;
+                earnBtnLabel.textContent = 'Đợi chút...';
+
+                let remaining = state.cooldownSeconds;
+                updateCooldownUI(remaining);
+
+                cooldownTimer = setInterval(() => {
+                    const now = Date.now();
+                    const elapsed = (now - state.lastEarnTime) / 1000;
+                    const left = Math.max(0, state.cooldownSeconds - elapsed);
+                    if (left <= 0) {
+                        clearInterval(cooldownTimer);
+                        cooldownTimer = null;
+                        isCooldown = false;
+                        earnBtn.disabled = false;
+                        earnBtnLabel.textContent = 'Nhận điểm';
+                        earnCooldown.textContent = '✨ Sẵn sàng!';
+                    } else {
+                        updateCooldownUI(left);
+                    }
+                }, 200);
+            }
+
+            function updateCooldownUI(seconds) {
+                const s = Math.ceil(seconds);
+                earnCooldown.textContent = `⏳ Đợi ${s}s`;
+                earnBtnLabel.textContent = `Đợi ${s}s`;
+            }
+
+            // ===========================
+            //  TOAST
+            // ===========================
+            function toast(message, type = 'info') {
+                const container = $('#toastContainer');
+                if (!container) return;
+
+                const el = document.createElement('div');
+                el.className = `toast ${type}`;
+
+                let icon = 'fa-circle-info';
+                if (type === 'success') icon = 'fa-check-circle';
+                if (type === 'error') icon = 'fa-circle-xmark';
+
+                el.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+                container.appendChild(el);
+
+                // Auto dismiss after 2.8s
+                setTimeout(() => {
+                    el.classList.add('out');
+                    setTimeout(() => {
+                        if (el.parentNode) el.remove();
+                    }, 320);
+                }, 2800);
+            }
+
+            // ===========================
+            //  NAVIGATION EVENTS (popstate)
+            // ===========================
+            window.addEventListener('popstate', (e) => {
+                const path = window.location.pathname;
+                const tab = routes[path] || 'info';
+                switchTab(tab);
+            });
+
+            // ===========================
+            //  INIT
+            // ===========================
+            function init() {
+                // Handle initial route
+                const path = window.location.pathname;
+                const tab = routes[path] || 'info';
+                switchTab(tab);
+
+                // Sync nav with URL
+                if (path !== '/') {
+                    // If the URL is /something, update the nav
+                    const t = routes[path] || 'info';
+                    switchTab(t);
+                }
+
+                // Render shop
+                renderShop();
+                updatePointsUI();
+                updateEarnStats();
+                updateInfoStats();
+
+                // Earn button
+                earnBtn.addEventListener('click', earnPoints);
+
+                // Check cooldown on load
+                const now = Date.now();
+                const elapsed = (now - state.lastEarnTime) / 1000;
+                if (elapsed < state.cooldownSeconds) {
+                    startCooldown();
+                }
+
+                // Show shop badge if there are items not owned
+                const allOwned = state.shopItems.every(item => state.inventory.includes(item.id));
+                if (!allOwned && state.shopItems.length > 0) {
+                    shopBadge.classList.add('show');
+                }
+
+                console.log('🐾 Wildario ready!');
+            }
+
+            // Expose navigate globally for inline onclick
+            window.navigate = navigate;
+
+            // Go!
+            init();
+
+        })();
+    </script>
+
+</body>
+</html>
