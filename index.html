@@ -1,1209 +1,1048 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WILDORIA · Official</title>
-  <!-- Firebase SDK -->
-  <script type="importmap">
-    {
-      "imports": {
-        "firebase/app": "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js",
-        "firebase/database": "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"
-      }
-    }
-  </script>
-  <style>
-    /* ===== RESET & BASE ===== */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body {
-      background: #080b0d;
-      min-height: 100vh;
-      color: #e9f0e6;
-      overflow: hidden;
-    }
-    /* ===== FANTASY BACKGROUND ===== */
-    .fantasy-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background: radial-gradient(ellipse at 30% 20%, #1a3328, #060a08 80%);
-      overflow: hidden;
-      pointer-events: none;
-    }
-    .leaf-bg {
-      position: absolute;
-      color: rgba(140, 200, 140, 0.08);
-      font-size: 3rem;
-      animation: floatLeaf linear infinite;
-      pointer-events: none;
-      user-select: none;
-    }
-    @keyframes floatLeaf {
-      0% { transform: translateY(100vh) rotate(0deg) scale(0.6); opacity: 0; }
-      10% { opacity: 0.3; }
-      90% { opacity: 0.3; }
-      100% { transform: translateY(-20vh) rotate(720deg) scale(1.2); opacity: 0; }
-    }
-    .particle-bg {
-      position: absolute;
-      width: 3px; height: 3px;
-      background: rgba(180, 220, 160, 0.4);
-      border-radius: 50%;
-      box-shadow: 0 0 15px rgba(160, 210, 140, 0.2);
-      animation: twinkle 5s infinite alternate;
-      pointer-events: none;
-    }
-    @keyframes twinkle {
-      0% { opacity: 0.1; transform: scale(0.5); }
-      100% { opacity: 0.8; transform: scale(1.5); }
-    }
-    /* ===== GLASS ===== */
-    .glass {
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      background: rgba(20, 35, 30, 0.45);
-      border: 1px solid rgba(160, 210, 150, 0.1);
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-      border-radius: 28px;
-    }
-    .glass-light {
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      background: rgba(30, 50, 40, 0.35);
-      border: 1px solid rgba(160, 210, 150, 0.08);
-      border-radius: 20px;
-    }
-    /* ===== LOADING SCREEN ===== */
-    #loading-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #080b0d;
-      transition: opacity 0.8s ease;
-    }
-    #loading-screen.hidden { opacity: 0; pointer-events: none; }
-    .loader-ring {
-      width: 80px; height: 80px;
-      border: 3px solid rgba(100, 180, 100, 0.08);
-      border-top: 3px solid #7fc97a;
-      border-radius: 50%;
-      animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-      margin-bottom: 2rem;
-    }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    .loader-icon {
-      font-size: 3.5rem;
-      margin-bottom: 1.5rem;
-      animation: pulseGlow 2s ease-in-out infinite;
-    }
-    @keyframes pulseGlow {
-      0%, 100% { filter: drop-shadow(0 0 8px rgba(120, 200, 120, 0.2)); transform: scale(1); }
-      50% { filter: drop-shadow(0 0 30px rgba(120, 200, 120, 0.4)); transform: scale(1.05); }
-    }
-    .loader-title {
-      font-size: 2.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #b3e0a0, #6fb86a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 6px;
-      margin-bottom: 0.5rem;
-      text-shadow: 0 0 40px rgba(100, 200, 100, 0.1);
-    }
-    .loader-sub {
-      font-size: 1.1rem;
-      color: rgba(180, 210, 170, 0.5);
-      letter-spacing: 3px;
-      font-weight: 300;
-    }
-    .loader-message {
-      font-size: 0.95rem;
-      color: rgba(180, 210, 170, 0.6);
-      margin-top: 1.2rem;
-      padding: 0.5rem 2rem;
-      border: 1px solid rgba(120, 180, 120, 0.08);
-      border-radius: 40px;
-      background: rgba(30, 50, 40, 0.2);
-      backdrop-filter: blur(4px);
-      min-height: 3.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 300;
-      max-width: 500px;
-      text-align: center;
-    }
-    .loader-message .highlight {
-      color: #8fc98a;
-      font-weight: 500;
-    }
-    .loader-progress {
-      margin-top: 1.5rem;
-      width: 220px;
-      height: 2px;
-      background: rgba(100, 150, 100, 0.1);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .loader-progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #5a9a55, #8fc98a);
-      border-radius: 10px;
-      animation: progressAnim 4s infinite ease-in-out;
-    }
-    @keyframes progressAnim {
-      0% { width: 0%; }
-      50% { width: 80%; }
-      100% { width: 100%; }
-    }
-    /* ===== MAIN APP ===== */
-    #app {
-      position: relative;
-      z-index: 2;
-      display: none;
-      padding: 1.2rem 1.5rem;
-      max-width: 1280px;
-      margin: 0 auto;
-      width: 100%;
-      min-height: 100vh;
-    }
-    #app.show { display: block; }
-    /* ===== NAV ===== */
-    nav {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.3rem 0.8rem;
-      padding: 0.5rem 1.8rem;
-      margin-bottom: 1.8rem;
-      background: rgba(12, 25, 20, 0.7);
-      backdrop-filter: blur(20px);
-      border-radius: 50px;
-      border: 1px solid rgba(140, 200, 130, 0.08);
-      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-    }
-    .nav-logo {
-      font-size: 1.6rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #c3e3b0, #6fb86a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 2px;
-      margin-right: 0.5rem;
-    }
-    .nav-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.1rem 0.6rem;
-      list-style: none;
-      flex: 1;
-    }
-    .nav-links a {
-      color: rgba(200, 220, 190, 0.6);
-      text-decoration: none;
-      font-size: 0.85rem;
-      padding: 0.3rem 0.6rem;
-      border-radius: 30px;
-      transition: 0.3s;
-      cursor: pointer;
-      font-weight: 400;
-    }
-    .nav-links a:hover, .nav-links a.active {
-      color: #e9f0e6;
-      background: rgba(100, 180, 100, 0.08);
-    }
-    .nav-actions {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      margin-left: auto;
-    }
-    .nav-user {
-      font-size: 0.8rem;
-      color: rgba(180, 210, 170, 0.5);
-      padding: 0.2rem 1rem;
-      border-radius: 30px;
-      background: rgba(30, 50, 40, 0.2);
-    }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid rgba(140, 200, 130, 0.15);
-      color: rgba(200, 220, 190, 0.6);
-      padding: 0.25rem 1.2rem;
-      border-radius: 40px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .btn-outline:hover {
-      background: rgba(100, 180, 100, 0.08);
-      border-color: rgba(140, 200, 130, 0.3);
-      color: #e9f0e6;
-    }
-    .btn-logout { border-color: rgba(200, 100, 100, 0.15); color: rgba(200, 150, 150, 0.5); }
-    .btn-logout:hover { border-color: rgba(200, 100, 100, 0.3); color: #eac0c0; }
-    /* ===== PAGES ===== */
-    .page {
-      display: none;
-      animation: fadeUp 0.5s ease;
-    }
-    .page.active { display: block; }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .page-title {
-      font-size: 1.8rem;
-      font-weight: 300;
-      color: rgba(200, 230, 190, 0.4);
-      letter-spacing: 4px;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid rgba(140, 200, 130, 0.05);
-      padding-bottom: 0.8rem;
-    }
-    /* ===== HOME ===== */
-    .home-hero {
-      text-align: center;
-      padding: 3rem 2rem;
-      background: rgba(20, 40, 30, 0.2);
-      border-radius: 40px;
-      border: 1px solid rgba(140, 200, 130, 0.05);
-    }
-    .home-hero h1 {
-      font-size: 4rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #c3e3b0, #6fb86a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 8px;
-    }
-    .home-hero .sub {
-      color: rgba(180, 210, 170, 0.3);
-      font-size: 1.1rem;
-      letter-spacing: 6px;
-      margin-top: 0.5rem;
-    }
-    .home-stats {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 2rem;
-    }
-    .stat-badge {
-      padding: 0.4rem 1.5rem;
-      border-radius: 40px;
-      background: rgba(30, 50, 40, 0.3);
-      border: 1px solid rgba(140, 200, 130, 0.06);
-      font-size: 0.9rem;
-      color: rgba(200, 220, 190, 0.6);
-    }
-    .stat-badge .num {
-      color: #b3e0a0;
-      font-weight: 500;
-    }
-    /* ===== PROFILE ===== */
-    .profile-grid {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 2rem;
-    }
-    @media (max-width: 768px) { .profile-grid { grid-template-columns: 1fr; } }
-    .profile-card {
-      padding: 2rem 1.5rem;
-      text-align: center;
-      background: rgba(20, 40, 30, 0.2);
-      border-radius: 32px;
-      border: 1px solid rgba(140, 200, 130, 0.05);
-    }
-    .profile-avatar {
-      width: 130px; height: 130px;
-      border-radius: 50%;
-      border: 2px solid rgba(140, 200, 130, 0.15);
-      object-fit: cover;
-      margin-bottom: 1rem;
-      background: #1a2a22;
-    }
-    .profile-name { font-size: 1.6rem; font-weight: 500; color: #ecf7e5; }
-    .profile-username { color: rgba(180, 210, 170, 0.3); font-size: 0.9rem; letter-spacing: 1px; }
-    .profile-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.6rem;
-      margin-top: 1.5rem;
-    }
-    .profile-stat {
-      background: rgba(0,0,0,0.15);
-      padding: 0.5rem;
-      border-radius: 16px;
-      border-left: 2px solid rgba(120, 200, 120, 0.2);
-    }
-    .profile-stat .label { font-size: 0.6rem; color: rgba(180, 210, 170, 0.2); text-transform: uppercase; letter-spacing: 1px; }
-    .profile-stat .value { font-size: 1.1rem; color: #dcefd4; font-weight: 400; }
-    .profile-info {
-      padding: 1.5rem 2rem;
-      background: rgba(20, 40, 30, 0.15);
-      border-radius: 32px;
-      border: 1px solid rgba(140, 200, 130, 0.05);
-    }
-    .profile-info .row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.6rem 0;
-      border-bottom: 1px solid rgba(100, 150, 100, 0.04);
-    }
-    .profile-info .row .lbl { color: rgba(180, 210, 170, 0.2); font-size: 0.85rem; }
-    .profile-info .row .val { color: rgba(200, 230, 190, 0.6); font-size: 0.85rem; }
-    /* ===== SHOP ===== */
-    .shop-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
-    }
-    .shop-card {
-      padding: 1.5rem 1rem;
-      text-align: center;
-      background: rgba(20, 40, 30, 0.15);
-      border-radius: 28px;
-      border: 1px solid rgba(140, 200, 130, 0.05);
-      transition: 0.3s;
-    }
-    .shop-card:hover { border-color: rgba(140, 200, 130, 0.15); transform: translateY(-3px); }
-    .shop-card .icon { font-size: 2.5rem; }
-    .shop-card h4 { color: rgba(200, 230, 190, 0.4); font-weight: 400; margin: 0.3rem 0; }
-    .shop-card .price { color: #b3e0a0; font-size: 1.1rem; margin: 0.3rem 0; }
-    .shop-card .btn-buy {
-      background: rgba(70, 130, 80, 0.15);
-      border: 1px solid rgba(120, 200, 120, 0.1);
-      color: rgba(200, 230, 190, 0.6);
-      padding: 0.4rem 1.8rem;
-      border-radius: 40px;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 0.85rem;
-    }
-    .shop-card .btn-buy:hover { background: rgba(70, 130, 80, 0.25); border-color: rgba(120, 200, 120, 0.2); }
-    /* ===== NEWS ===== */
-    .news-item {
-      padding: 1rem 1.5rem;
-      background: rgba(20, 40, 30, 0.1);
-      border-radius: 20px;
-      border: 1px solid rgba(140, 200, 130, 0.04);
-      margin-bottom: 0.8rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .news-item .code { color: #8fc98a; font-weight: 500; letter-spacing: 2px; }
-    .news-item .date { color: rgba(180, 210, 170, 0.15); font-size: 0.8rem; }
-    .news-search {
-      display: flex;
-      gap: 0.8rem;
-      margin-bottom: 1.5rem;
-    }
-    .news-search input {
-      flex: 1;
-      padding: 0.6rem 1.2rem;
-      background: rgba(20, 40, 30, 0.2);
-      border: 1px solid rgba(140, 200, 130, 0.06);
-      border-radius: 40px;
-      color: #e9f0e6;
-      font-size: 0.9rem;
-      outline: none;
-      transition: 0.3s;
-    }
-    .news-search input:focus { border-color: rgba(140, 200, 130, 0.15); }
-    .news-search button {
-      padding: 0.6rem 1.8rem;
-      background: rgba(70, 130, 80, 0.15);
-      border: 1px solid rgba(120, 200, 120, 0.08);
-      border-radius: 40px;
-      color: rgba(200, 230, 190, 0.4);
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .news-search button:hover { background: rgba(70, 130, 80, 0.2); }
-    /* ===== EARN (Coming Soon) ===== */
-    .coming-soon {
-      text-align: center;
-      padding: 4rem 2rem;
-    }
-    .coming-soon .big { font-size: 4rem; opacity: 0.1; }
-    .coming-soon h2 { font-weight: 300; color: rgba(200, 230, 190, 0.1); letter-spacing: 6px; margin-top: 1rem; }
-    /* ===== ERROR OVERLAY ===== */
-    #errorOverlay {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(8, 11, 13, 0.92);
-      backdrop-filter: blur(12px);
-    }
-    #errorOverlay.show { display: flex; }
-    .error-box {
-      max-width: 480px;
-      padding: 3rem 2rem;
-      text-align: center;
-      background: rgba(30, 20, 20, 0.3);
-      backdrop-filter: blur(16px);
-      border-radius: 50px;
-      border: 1px solid rgba(200, 120, 120, 0.05);
-    }
-    .error-box .icon { font-size: 3rem; opacity: 0.2; }
-    .error-box h2 { font-size: 1.8rem; font-weight: 300; color: rgba(200, 150, 150, 0.2); margin: 0.5rem 0; }
-    .error-box p { color: rgba(180, 180, 170, 0.2); font-size: 0.9rem; }
-    .error-box .btn-home {
-      margin-top: 1.5rem;
-      padding: 0.6rem 2.5rem;
-      background: rgba(70, 130, 80, 0.1);
-      border: 1px solid rgba(120, 200, 120, 0.05);
-      border-radius: 40px;
-      color: rgba(200, 230, 190, 0.2);
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .error-box .btn-home:hover { background: rgba(70, 130, 80, 0.15); }
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      nav { flex-direction: column; align-items: stretch; padding: 0.8rem 1.2rem; }
-      .nav-actions { margin-left: 0; justify-content: flex-end; }
-      .home-hero h1 { font-size: 2.5rem; letter-spacing: 4px; }
-      .loader-title { font-size: 2rem; }
-      .loader-message { font-size: 0.85rem; padding: 0.5rem 1rem; max-width: 90%; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WILDORIA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5a4bd1;
+            --secondary: #00cec9;
+            --accent: #fd79a8;
+            --bg-dark: #0a0a0f;
+            --bg-card: #16161f;
+            --bg-card-hover: #1e1e2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --border: #2d2d3d;
+            --success: #00b894;
+            --danger: #e17055;
+            --glow: rgba(108, 92, 231, 0.4);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== AUTH SCREEN ===== */
+        .auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .auth-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .auth-container {
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .wildoria-logo {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px var(--glow);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px var(--glow)); }
+            to { filter: drop-shadow(0 0 20px var(--glow)); }
+        }
+
+        .spinner-container {
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(108, 92, 231, 0.2);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .auth-message {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 15px;
+            border: 2px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-message p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .auth-message .highlight {
+            color: var(--primary);
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            background: rgba(108, 92, 231, 0.1);
+            border-radius: 5px;
+        }
+
+        /* ===== LOGIN SUCCESS ===== */
+        .login-success {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+            transition: opacity 0.5s ease;
+        }
+
+        .login-success.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .success-container {
+            text-align: center;
+            position: relative;
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--success), #55efc4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 2rem;
+            animation: scaleIn 0.5s ease;
+            box-shadow: 0 0 50px rgba(0, 184, 148, 0.5);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .success-text {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--success), #55efc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .success-particles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: particleFloat 2s ease-out forwards;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* ===== MAIN APP ===== */
+        .main-app {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .main-app.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: var(--bg-card);
+            border-bottom: 2px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: var(--text-primary);
+            border-color: var(--primary);
+            box-shadow: 0 5px 20px var(--glow);
+        }
+
+        .logout-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--danger);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #d63031;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(225, 112, 85, 0.4);
+        }
+
+        /* ===== CONTENT ===== */
+        .content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .tab-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* ===== NEWS TAB ===== */
+        .search-container {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-input {
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .search-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .news-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .news-item {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .news-item:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .news-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .news-item p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .news-code {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(108, 92, 231, 0.2);
+            border-radius: 5px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-top: 1rem;
+        }
+
+        /* ===== PROFILE TAB ===== */
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-avatar {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 30px var(--glow);
+            object-fit: cover;
+        }
+
+        .profile-stats {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 700;
+            color: var(--text-secondary);
+            min-width: 200px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .stat-note {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .info-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .info-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+        }
+
+        .profile-info {
+            margin-top: 1rem;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .profile-info.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-content p {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-content p:last-child {
+            border-bottom: none;
+        }
+
+        .status-active {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        /* ===== SHOP TAB ===== */
+        .shop-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .shop-container h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .shop-item {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .shop-item:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .shop-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .shop-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .exchange-rate {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .shop-btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .shop-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--glow);
+        }
+
+        /* ===== EARN TAB ===== */
+        .coming-soon {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .coming-soon-icon {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .coming-soon h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .coming-soon p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .tab-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .shop-items {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
-
-  <!-- ===== FANTASY BG ===== -->
-  <div class="fantasy-bg" id="fantasyBg"></div>
-
-  <!-- ===== LOADING SCREEN ===== -->
-  <div id="loading-screen">
-    <div class="loader-ring"></div>
-    <div class="loader-icon">🌿</div>
-    <div class="loader-title">WILDORIA</div>
-    <div class="loader-sub">REALM OF ANCIENTS</div>
-    <div class="loader-message" id="loaderMessage">Initializing connection...</div>
-    <div class="loader-progress"><div class="loader-progress-bar"></div></div>
-  </div>
-
-  <!-- ===== ERROR OVERLAY ===== -->
-  <div id="errorOverlay">
-    <div class="error-box">
-      <div class="icon">🌿</div>
-      <h2 id="errorTitle">Connection Lost</h2>
-      <p id="errorDesc">Unable to reach Wildoria servers.</p>
-      <button class="btn-home" id="errorHomeBtn">⟳ Retry</button>
-    </div>
-  </div>
-
-  <!-- ===== MAIN APP ===== -->
-  <div id="app">
-    <!-- NAV -->
-    <nav>
-      <span class="nav-logo">🌲 WILDORIA</span>
-      <ul class="nav-links">
-        <li><a class="active" data-page="home">Home</a></li>
-        <li><a data-page="news">News</a></li>
-        <li><a data-page="profile">Profile</a></li>
-        <li><a data-page="shop">Shop</a></li>
-        <li><a data-page="earn">Earn</a></li>
-      </ul>
-      <div class="nav-actions">
-        <span class="nav-user" id="navUser">🌱 Guest</span>
-        <button class="btn-outline btn-logout" id="logoutBtn">⛉ Logout</button>
-      </div>
-    </nav>
-
-    <!-- PAGE: HOME -->
-    <div id="page-home" class="page active">
-      <div class="home-hero glass">
-        <h1>WILDORIA</h1>
-        <div class="sub">THE FOREST AWAITS</div>
-        <div class="home-stats">
-          <span class="stat-badge">🍃 Leaf <span class="num" id="homeLeaf">0</span></span>
-          <span class="stat-badge">✨ Lumen <span class="num" id="homeLumen">0</span></span>
-          <span class="stat-badge">⭐ WebToken <span class="num" id="homeToken">0</span></span>
+    <!-- AUTH SCREEN -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-container">
+            <div class="wildoria-logo">-WILDORIA-</div>
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+            <div id="authMessage" class="auth-message">
+                <p>PLEASE GO TO GAME, CLICK <span class="highlight">{CODE}</span> BUTTON TO CREATE LINK, GO TO CHROME... TO PASTE THAT LINK AND LOGIN</p>
+            </div>
         </div>
-      </div>
     </div>
 
-    <!-- PAGE: NEWS -->
-    <div id="page-news" class="page">
-      <div class="page-title">📰 NEWS & UPDATES</div>
-      <div class="news-search">
-        <input type="text" id="newsSearchInput" placeholder="Enter update code..." />
-        <button id="newsSearchBtn">🔍 Search</button>
-      </div>
-      <div id="newsList">
-        <div class="news-item glass-light">
-          <span>🌿 <strong>WEBSITE</strong> WILDORIA UPDATE <span class="code">K9I8</span></span>
-          <span class="date">2026-07-13</span>
+    <!-- LOGIN SUCCESS -->
+    <div id="loginSuccess" class="login-success hidden">
+        <div class="success-container">
+            <div class="success-icon">✓</div>
+            <h1 class="success-text">LOGIN SUCCESS</h1>
+            <div class="success-particles" id="particles"></div>
         </div>
-        <div class="news-item glass-light">
-          <span>🎮 <strong>GAME</strong> WILDORIA UPDATE <span class="code">KPOI9</span></span>
-          <span class="date">2026-07-12</span>
-        </div>
-        <div class="news-item glass-light">
-          <span>🌿 <strong>WEBSITE</strong> NEW SHOP ITEMS <span class="code">X7M2</span></span>
-          <span class="date">2026-07-10</span>
-        </div>
-        <div class="news-item glass-light">
-          <span>🎮 <strong>GAME</strong> BOSS EVENT <span class="code">LQ8P</span></span>
-          <span class="date">2026-07-08</span>
-        </div>
-      </div>
     </div>
 
-    <!-- PAGE: PROFILE -->
-    <div id="page-profile" class="page">
-      <div class="page-title">👤 PROFILE</div>
-      <div class="profile-grid">
-        <div class="profile-card glass">
-          <img class="profile-avatar" id="profileAvatar" src="https://www.roblox.com/headshot-thumbnail/image?userId=1&width=420&height=420&format=png" alt="avatar" />
-          <div class="profile-name" id="profileDisplayName">—</div>
-          <div class="profile-username" id="profileUsername">@unknown</div>
-          <div class="profile-stats">
-            <div class="profile-stat"><div class="label">🍃 Leaf</div><div class="value" id="profLeaf">0</div></div>
-            <div class="profile-stat"><div class="label">✨ Lumen</div><div class="value" id="profLumen">0</div></div>
-            <div class="profile-stat"><div class="label">⭐ WebToken</div><div class="value" id="profToken">0</div></div>
-            <div class="profile-stat"><div class="label">⏳ Playtime</div><div class="value" id="profPlaytime">0h</div></div>
-          </div>
-        </div>
-        <div class="profile-info glass">
-          <div style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;" id="infoToggle">
-            <span style="color:rgba(200,230,190,0.2); font-size:1.2rem;">▼ YOUR INFORMATION</span>
-            <span style="color:rgba(200,230,190,0.1);">click to expand</span>
-          </div>
-          <div id="infoContent" style="display:none; margin-top:1.5rem;">
-            <div class="row"><span class="lbl">Wildoria ID</span><span class="val" id="profWildoriaId">—</span></div>
-            <div class="row"><span class="lbl">User ID</span><span class="val" id="profUserId">—</span></div>
-            <div class="row"><span class="lbl">Joined</span><span class="val" id="profJoinDate">—</span></div>
-            <div class="row"><span class="lbl">Achievements</span><span class="val" id="profAchievements">🏅 0</span></div>
-            <div class="row"><span class="lbl">Token Login</span><span class="val" id="profTokenLogin" style="font-size:0.7rem; opacity:0.3;">—</span></div>
-          </div>
-        </div>
-      </div>
+    <!-- MAIN APP -->
+    <div id="mainApp" class="main-app">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-logo">-WILDORIA-</div>
+            <nav class="nav-tabs">
+                <a href="/newswildoria/" class="nav-tab active" data-tab="news">NEWS</a>
+                <a href="/profile" class="nav-tab" data-tab="profile">PROFILE</a>
+                <a href="/shop" class="nav-tab" data-tab="shop">SHOP</a>
+                <a href="/earn" class="nav-tab" data-tab="earn">EARN</a>
+            </nav>
+            <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+        </header>
+
+        <!-- CONTENT -->
+        <main class="content">
+            <!-- NEWS TAB -->
+            <section id="newsTab" class="tab-content active">
+                <div class="tab-header">
+                    <h2>📰 NEWS</h2>
+                    <div class="search-container">
+                        <input type="text" id="newsSearch" placeholder="Enter update code..." class="search-input">
+                        <button id="searchBtn" class="search-btn">🔍</button>
+                    </div>
+                </div>
+                <div id="newsList" class="news-list"></div>
+            </section>
+
+            <!-- PROFILE TAB -->
+            <section id="profileTab" class="tab-content">
+                <div class="profile-container">
+                    <div class="profile-avatar">
+                        <img id="userAvatar" src="https://via.placeholder.com/150/6c5ce7/ffffff?text=W" alt="Avatar">
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Leaf :</span>
+                            <span id="leafBalance" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Lumen :</span>
+                            <span id="lumenBalance" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">WEBSITETOKEN :</span>
+                            <span id="tokenBalance" class="stat-value">0</span>
+                            <span class="stat-note">(ONLY USE IN WEBSITE)</span>
+                        </div>
+                    </div>
+                    <button id="infoToggle" class="info-btn">your information 🔼</button>
+                    <div id="profileInfo" class="profile-info">
+                        <div class="info-content">
+                            <p><strong>Username:</strong> <span id="infoUsername">-</span></p>
+                            <p><strong>User ID:</strong> <span id="infoUserId">-</span></p>
+                            <p><strong>Join Date:</strong> <span id="infoJoinDate">-</span></p>
+                            <p><strong>Status:</strong> <span class="status-active">Active</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SHOP TAB -->
+            <section id="shopTab" class="tab-content">
+                <div class="shop-container">
+                    <h2>🛒 SHOP</h2>
+                    <div class="shop-items">
+                        <div class="shop-item">
+                            <div class="shop-icon">🍃 → ✨</div>
+                            <h3>LEAF → LUMEN</h3>
+                            <p class="exchange-rate">5,000 LEAF → 50 LUMEN</p>
+                            <a href="/shop/lumentop" class="shop-btn">Exchange Now</a>
+                        </div>
+                        <div class="shop-item">
+                            <div class="shop-icon">🪙 → 🍃</div>
+                            <h3>WEBSITETOKEN → LEAF</h3>
+                            <p class="exchange-rate">5,000 WEBSITETOKEN → 500 LEAF</p>
+                            <a href="/shop/leafiop" class="shop-btn">Exchange Now</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EARN TAB -->
+            <section id="earnTab" class="tab-content">
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚀</div>
+                    <h2>COMING SOON</h2>
+                    <p>Something amazing is on the way...</p>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <!-- PAGE: SHOP -->
-    <div id="page-shop" class="page">
-      <div class="page-title">🛒 SHOP</div>
-      <div class="shop-grid">
-        <div class="shop-card glass">
-          <div class="icon">🔄</div>
-          <h4>Leaf → Lumen</h4>
-          <div class="price">5000 Leaf → 50 Lumen</div>
-          <button class="btn-buy" id="shopLeafToLumen">Exchange</button>
-        </div>
-        <div class="shop-card glass">
-          <div class="icon">🔄</div>
-          <h4>WebToken → Leaf</h4>
-          <div class="price">5000 WebToken → 500 Leaf</div>
-          <button class="btn-buy" id="shopTokenToLeaf">Exchange</button>
-        </div>
-        <div class="shop-card glass">
-          <div class="icon">🔄</div>
-          <h4>Lumen → WebToken</h4>
-          <div class="price">100 Lumen → 10 WebToken</div>
-          <button class="btn-buy" id="shopLumenToToken">Exchange</button>
-        </div>
-        <div class="shop-card glass">
-          <div class="icon">🌿</div>
-          <h4>Leaf Pack</h4>
-          <div class="price">⭐ 20 WebToken</div>
-          <button class="btn-buy" data-cost="20" data-currency="token" data-reward="leaf" data-amount="200">Buy</button>
-        </div>
-        <div class="shop-card glass">
-          <div class="icon">✨</div>
-          <h4>Lumen Pack</h4>
-          <div class="price">⭐ 50 WebToken</div>
-          <button class="btn-buy" data-cost="50" data-currency="token" data-reward="lumen" data-amount="20">Buy</button>
-        </div>
-        <div class="shop-card glass">
-          <div class="icon">⭐</div>
-          <h4>Token Pack</h4>
-          <div class="price">🍃 1000 Leaf</div>
-          <button class="btn-buy" data-cost="1000" data-currency="leaf" data-reward="token" data-amount="5">Buy</button>
-        </div>
-      </div>
-    </div>
+    <!-- FIREBASE SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    <!-- PAGE: EARN -->
-    <div id="page-earn" class="page">
-      <div class="coming-soon">
-        <div class="big">⚡</div>
-        <h2>COMING SOON</h2>
-        <p style="color:rgba(180,210,170,0.05); margin-top:1rem;">Earn rewards, complete quests, and more...</p>
-      </div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from 'firebase/app';
-    import { getDatabase, ref, get, update, onValue } from 'firebase/database';
-
-    // ===== FIREBASE CONFIG =====
-    const firebaseConfig = {
-      apiKey: "AIzaSyByoUZoZ2KuJ9BNxe2pYHz1PHCa6LIA2AE",
-      authDomain: "wiki-73173.firebaseapp.com",
-      databaseURL: "https://wiki-73173-default-rtdb.firebaseio.com",
-      projectId: "wiki-73173",
-      storageBucket: "wiki-73173.firebasestorage.app",
-      messagingSenderId: "974130503449",
-      appId: "1:974130503449:web:0aae44a3b118e88ea12f88",
-      measurementId: "G-Z0WEND2SQ0"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // ===== DOM REFS =====
-    const loadingScreen = document.getElementById('loading-screen');
-    const loaderMsg = document.getElementById('loaderMessage');
-    const appContainer = document.getElementById('app');
-    const errorOverlay = document.getElementById('errorOverlay');
-    const errorTitle = document.getElementById('errorTitle');
-    const errorDesc = document.getElementById('errorDesc');
-    const errorHomeBtn = document.getElementById('errorHomeBtn');
-
-    const navUser = document.getElementById('navUser');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    // Profile
-    const profileAvatar = document.getElementById('profileAvatar');
-    const profileDisplayName = document.getElementById('profileDisplayName');
-    const profileUsername = document.getElementById('profileUsername');
-    const profLeaf = document.getElementById('profLeaf');
-    const profLumen = document.getElementById('profLumen');
-    const profToken = document.getElementById('profToken');
-    const profPlaytime = document.getElementById('profPlaytime');
-    const profWildoriaId = document.getElementById('profWildoriaId');
-    const profUserId = document.getElementById('profUserId');
-    const profJoinDate = document.getElementById('profJoinDate');
-    const profAchievements = document.getElementById('profAchievements');
-    const profTokenLogin = document.getElementById('profTokenLogin');
-
-    // Home
-    const homeLeaf = document.getElementById('homeLeaf');
-    const homeLumen = document.getElementById('homeLumen');
-    const homeToken = document.getElementById('homeToken');
-
-    // News
-    const newsSearchInput = document.getElementById('newsSearchInput');
-    const newsSearchBtn = document.getElementById('newsSearchBtn');
-    const newsList = document.getElementById('newsList');
-
-    // ===== STATE =====
-    let currentSession = null;
-    let currentPlayerId = null;
-    let unsubscribe = null;
-    let loadingInterval = null;
-
-    // ===== LOADING MESSAGES =====
-    const loadingMessages = [
-      'Connecting to Wildoria...',
-      'Loading ancient forest...',
-      'Awakening the spirits...',
-      'Verifying credentials...',
-      'Preparing your journey...',
-      'Summoning the realm...'
-    ];
-    const waitingMessage = '⚠️ PLEASE GO TO GAME → PRESS {CODE} BUTTON → COPY LINK → OPEN IN CHROME TO LOGIN';
-    const verifyingMessage = '🔍 VERIFYING IDENTITY... PLEASE WAIT...';
-
-    // ===== HELPERS =====
-    function showLoading(msg) {
-      if (loadingInterval) clearInterval(loadingInterval);
-      loadingScreen.classList.remove('hidden');
-      if (msg) {
-        loaderMsg.innerHTML = msg;
-      } else {
-        loaderMsg.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-        loadingInterval = setInterval(() => {
-          loaderMsg.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-        }, 3000);
-      }
-    }
-
-    function hideLoading() {
-      if (loadingInterval) clearInterval(loadingInterval);
-      loadingScreen.classList.add('hidden');
-    }
-
-    function showError(title, desc) {
-      errorTitle.textContent = title;
-      errorDesc.textContent = desc;
-      errorOverlay.classList.add('show');
-    }
-
-    function hideError() {
-      errorOverlay.classList.remove('show');
-    }
-
-    function getSession() {
-      try {
-        const raw = localStorage.getItem('wildoria_session');
-        return raw ? JSON.parse(raw) : null;
-      } catch { return null; }
-    }
-
-    function setSession(data) {
-      localStorage.setItem('wildoria_session', JSON.stringify(data));
-      currentSession = data;
-    }
-
-    function clearSession() {
-      localStorage.removeItem('wildoria_session');
-      currentSession = null;
-      currentPlayerId = null;
-      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-    }
-
-    // ===== RENDER PROFILE =====
-    function renderProfile(s) {
-      if (!s) return;
-      profileAvatar.src = s.avatar || 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=420&height=420&format=png';
-      profileDisplayName.textContent = s.displayName || 'Wanderer';
-      profileUsername.textContent = '@' + (s.username || 'unknown');
-      profLeaf.textContent = s.leaf ?? 0;
-      profLumen.textContent = s.lumen ?? 0;
-      profToken.textContent = s.token ?? 0;
-      const hrs = Math.floor((s.playTime || 0) / 60);
-      profPlaytime.textContent = hrs + 'h';
-      profWildoriaId.textContent = s.wildoriaId || '—';
-      profUserId.textContent = s.userId || '—';
-      profJoinDate.textContent = s.joinDate ? new Date(s.joinDate).toLocaleDateString() : '—';
-      profAchievements.textContent = '🏅 ' + (s.achievements || 0);
-      profTokenLogin.textContent = s.tokenLogin || '—';
-
-      navUser.textContent = '🌱 ' + (s.displayName || 'Guest');
-      homeLeaf.textContent = s.leaf ?? 0;
-      homeLumen.textContent = s.lumen ?? 0;
-      homeToken.textContent = s.token ?? 0;
-    }
-
-    // ===== REAL-TIME SYNC =====
-    function setupRealtimeSync(playerId) {
-      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-      const playerRef = ref(db, `players/${playerId}`);
-      unsubscribe = onValue(playerRef, (snap) => {
-        if (!snap.exists()) return;
-        const p = snap.val();
-        const s = getSession();
-        if (!s) return;
-        const updated = { ...s,
-          leaf: p.leaf ?? s.leaf,
-          lumen: p.lumen ?? s.lumen,
-          token: p.token ?? s.token,
-          playTime: p.playTime ?? s.playTime,
-          achievements: p.achievements ?? s.achievements,
-          avatar: p.avatar || s.avatar,
-          displayName: p.displayName || s.displayName,
-          username: p.username || s.username,
-          wildoriaId: p.wildoriaId || s.wildoriaId,
-          tokenLogin: p.tokenLogin || s.tokenLogin
-        };
-        setSession(updated);
-        renderProfile(updated);
-      }, (err) => { console.error('Sync error:', err); });
-    }
-
-    // ===== UPDATE PLAYER STATS =====
-    async function updatePlayerStats(updates) {
-      if (!currentPlayerId) return false;
-      try {
-        await update(ref(db, `players/${currentPlayerId}`), updates);
-        return true;
-      } catch (e) {
-        console.error('Update error:', e);
-        alert('❌ Update failed! Please try again.');
-        return false;
-      }
-    }
-
-    // ===== VALIDATE SESSION =====
-    async function validateSession() {
-      const s = getSession();
-
-      if (!s || !s.userId) {
-        showLoading(waitingMessage);
-        setTimeout(() => validateSession(), 5000);
-        return false;
-      }
-
-      showLoading(verifyingMessage);
-      try {
-        const snap = await get(ref(db, `players/${s.userId}`));
-        if (!snap.exists()) {
-          clearSession();
-          showLoading(waitingMessage);
-          setTimeout(() => validateSession(), 5000);
-          return false;
-        }
-        const p = snap.val();
-        const updated = { ...s,
-          leaf: p.leaf ?? s.leaf,
-          lumen: p.lumen ?? s.lumen,
-          token: p.token ?? s.token,
-          playTime: p.playTime ?? s.playTime,
-          achievements: p.achievements ?? s.achievements,
-          avatar: p.avatar || s.avatar,
-          displayName: p.displayName || s.displayName,
-          username: p.username || s.username,
-          wildoriaId: p.wildoriaId || s.wildoriaId,
-          tokenLogin: p.tokenLogin || s.tokenLogin
-        };
-        setSession(updated);
-        currentPlayerId = s.userId;
-        renderProfile(updated);
-        appContainer.classList.add('show');
-        hideError();
-        hideLoading();
-        setupRealtimeSync(currentPlayerId);
-        return true;
-      } catch (e) {
-        console.error('Validation error:', e);
-        showLoading('⚠️ Connection lost. Retrying...');
-        setTimeout(() => validateSession(), 3000);
-        return false;
-      }
-    }
-
-    // ===== LOGIN VIA CODE =====
-    async function attemptLoginWithCode(code) {
-      if (!code || code.length < 4) {
-        showError('Invalid Code', 'The login code is missing or malformed.');
-        return;
-      }
-
-      showLoading('🔍 VERIFYING IDENTITY... PLEASE WAIT...');
-
-      try {
-        const snap = await get(ref(db, `linkCodes/${code}`));
-        if (!snap.exists()) {
-          showLoading(waitingMessage);
-          setTimeout(() => {
-            hideError();
-            showLoading(waitingMessage);
-          }, 3000);
-          return;
-        }
-
-        const data = snap.val();
-        const now = Date.now();
-        const expiry = data.createdAt ? data.createdAt + 600000 : 0;
-
-        if (now > expiry) {
-          showLoading(waitingMessage);
-          setTimeout(() => {
-            hideError();
-            showLoading(waitingMessage);
-          }, 3000);
-          return;
-        }
-
-        if (data.used === true) {
-          showLoading(waitingMessage);
-          setTimeout(() => {
-            hideError();
-            showLoading(waitingMessage);
-          }, 3000);
-          return;
-        }
-
-        const playerId = data.playerId;
-        if (!playerId) {
-          showLoading(waitingMessage);
-          setTimeout(() => {
-            hideError();
-            showLoading(waitingMessage);
-          }, 3000);
-          return;
-        }
-
-        const pSnap = await get(ref(db, `players/${playerId}`));
-        if (!pSnap.exists()) {
-          showLoading(waitingMessage);
-          setTimeout(() => {
-            hideError();
-            showLoading(waitingMessage);
-          }, 3000);
-          return;
-        }
-
-        const p = pSnap.val();
-
-        // MARK CODE AS USED
-        await update(ref(db, `linkCodes/${code}`), { used: true, usedAt: now });
-
-        const session = {
-          userId: playerId,
-          username: p.username || 'traveler',
-          displayName: p.displayName || 'Wanderer',
-          wildoriaId: p.wildoriaId || `WIL-${playerId}-${Math.floor(Math.random() * 10)}`,
-          avatar: p.avatar || 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=420&height=420&format=png',
-          leaf: p.leaf || 0,
-          lumen: p.lumen || 0,
-          token: p.token || 0,
-          playTime: p.playTime || 0,
-          joinDate: p.joinDate || new Date().toISOString(),
-          achievements: p.achievements || 0,
-          tokenLogin: p.tokenLogin || `TOKEN-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
-          loginTime: now
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyByoUZoZ2KuJ9BNxe2pYHz1PHCa6LIA2AE",
+            authDomain: "wiki-73173.firebaseapp.com",
+            databaseURL: "https://wiki-73173-default-rtdb.firebaseio.com",
+            projectId: "wiki-73173",
+            storageBucket: "wiki-73173.firebasestorage.app",
+            messagingSenderId: "974130503449",
+            appId: "1:974130503449:web:0aae44a3b118e88ea12f88",
+            measurementId: "G-Z0WEND2SQ0"
         };
 
-        setSession(session);
-        currentPlayerId = playerId;
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Show success
-        loaderMsg.innerHTML = '✅ <strong>LOGIN SUCCESSFUL!</strong> Welcome, ' + session.displayName + '!';
-        loaderMsg.style.color = '#8fc98a';
+        // DOM Elements
+        const authScreen = document.getElementById('authScreen');
+        const loginSuccess = document.getElementById('loginSuccess');
+        const mainApp = document.getElementById('mainApp');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const infoToggle = document.getElementById('infoToggle');
+        const profileInfo = document.getElementById('profileInfo');
+        const newsSearch = document.getElementById('newsSearch');
+        const searchBtn = document.getElementById('searchBtn');
+        const newsList = document.getElementById('newsList');
 
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
+        // Check URL for login code
+        const path = window.location.pathname;
+        const isLoginLink = path.startsWith('/link/');
+        const loginCode = isLoginLink ? path.split('/link/')[1] : null;
 
-      } catch (e) {
-        console.error('Login error:', e);
-        showLoading(waitingMessage);
-        setTimeout(() => {
-          hideError();
-          showLoading(waitingMessage);
-        }, 3000);
-      }
-    }
-
-    // ===== LOGOUT =====
-    function logout() {
-      clearSession();
-      localStorage.clear();
-      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-      window.location.href = '/';
-    }
-
-    // ===== NAVIGATION =====
-    document.querySelectorAll('.nav-links a').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        const page = link.dataset.page;
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        const target = document.getElementById('page-' + page);
-        if (target) target.classList.add('active');
-
-        // Update URL
-        const newUrl = window.location.origin + '/' + page;
-        window.history.pushState({ page }, '', newUrl);
-      });
-    });
-
-    // ===== INFO TOGGLE =====
-    document.getElementById('infoToggle').addEventListener('click', () => {
-      const content = document.getElementById('infoContent');
-      content.style.display = content.style.display === 'none' ? 'block' : 'none';
-    });
-
-    // ===== SHOP HANDLERS =====
-    document.addEventListener('click', async (e) => {
-      const target = e.target;
-
-      // Shop exchange buttons
-      if (target.id === 'shopLeafToLumen') {
-        const leaf = currentSession?.leaf || 0;
-        if (leaf < 5000) {
-          alert('❌ Need 5000 Leaf. You have ' + leaf);
-          return;
-        }
-        if (await updatePlayerStats({ leaf: leaf - 5000, lumen: (currentSession?.lumen || 0) + 50 })) {
-          alert('✅ Exchanged 5000 Leaf → 50 Lumen!');
-        }
-      }
-
-      if (target.id === 'shopTokenToLeaf') {
-        const token = currentSession?.token || 0;
-        if (token < 5000) {
-          alert('❌ Need 5000 WebToken. You have ' + token);
-          return;
-        }
-        if (await updatePlayerStats({ token: token - 5000, leaf: (currentSession?.leaf || 0) + 500 })) {
-          alert('✅ Exchanged 5000 WebToken → 500 Leaf!');
-        }
-      }
-
-      if (target.id === 'shopLumenToToken') {
-        const lumen = currentSession?.lumen || 0;
-        if (lumen < 100) {
-          alert('❌ Need 100 Lumen. You have ' + lumen);
-          return;
-        }
-        if (await updatePlayerStats({ lumen: lumen - 100, token: (currentSession?.token || 0) + 10 })) {
-          alert('✅ Exchanged 100 Lumen → 10 WebToken!');
-        }
-      }
-
-      // Shop buy buttons
-      if (target.classList.contains('btn-buy')) {
-        const cost = parseInt(target.dataset.cost) || 0;
-        const currency = target.dataset.currency || 'leaf';
-        const reward = target.dataset.reward;
-        const amount = parseInt(target.dataset.amount) || 0;
-
-        const leaf = currentSession?.leaf || 0;
-        const lumen = currentSession?.lumen || 0;
-        const token = currentSession?.token || 0;
-
-        let canBuy = false;
-        let updates = {};
-        let msg = '';
-
-        if (currency === 'leaf') {
-          if (leaf < cost) { alert('❌ Not enough Leaf! Need ' + cost); return; }
-          updates = { leaf: leaf - cost };
-          canBuy = true;
-        } else if (currency === 'lumen') {
-          if (lumen < cost) { alert('❌ Not enough Lumen! Need ' + cost); return; }
-          updates = { lumen: lumen - cost };
-          canBuy = true;
-        } else if (currency === 'token') {
-          if (token < cost) { alert('❌ Not enough WebToken! Need ' + cost); return; }
-          updates = { token: token - cost };
-          canBuy = true;
+        // Handle login link
+        if (isLoginLink && loginCode) {
+            handleLoginWithCode(loginCode);
         }
 
-        if (canBuy) {
-          if (reward === 'leaf') { updates.leaf = (leaf - cost) + amount; }
-          else if (reward === 'lumen') { updates.lumen = (lumen - cost) + amount; }
-          else if (reward === 'token') { updates.token = (token - cost) + amount; }
+        // Auth state listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is logged in
+                if (!isLoginLink) {
+                    showMainApp();
+                    await loadUserData(user);
+                }
+            } else {
+                // User is not logged in
+                if (!isLoginLink) {
+                    showAuthScreen();
+                }
+            }
+        });
 
-          if (await updatePlayerStats(updates)) {
-            alert('✅ Purchased successfully!');
-          }
+        // Handle login with code
+        async function handleLoginWithCode(code) {
+            showVerifyingMessage();
+            
+            try {
+                // Check if code exists in Firebase
+                const codeDoc = await getDoc(doc(db, 'loginCodes', code));
+                
+                if (codeDoc.exists()) {
+                    const codeData = codeDoc.data();
+                    
+                    // Simulate authentication (in real app, you'd use Firebase Auth)
+                    // For demo, we'll create a custom token or use email/password
+                    // Here we'll just show success and redirect
+                    
+                    setTimeout(() => {
+                        showLoginSuccess();
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 2000);
+                    }, 1500);
+                } else {
+                    // Invalid code
+                    setTimeout(() => {
+                        showAuthScreen();
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAuthScreen();
+            }
         }
-      }
-    });
 
-    // ===== NEWS SEARCH =====
-    newsSearchBtn.addEventListener('click', () => {
-      const query = newsSearchInput.value.trim().toUpperCase();
-      if (!query) {
-        alert('Please enter an update code.');
-        return;
-      }
-      // Search in news items
-      const items = newsList.querySelectorAll('.news-item');
-      let found = false;
-      items.forEach(item => {
-        const codeEl = item.querySelector('.code');
-        if (codeEl && codeEl.textContent === query) {
-          item.style.borderColor = 'rgba(140,200,130,0.2)';
-          item.style.background = 'rgba(40,70,50,0.15)';
-          found = true;
-          // Scroll to it
-          item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-          item.style.borderColor = 'transparent';
-          item.style.background = 'transparent';
+        // Show auth screen
+        function showAuthScreen() {
+            authScreen.classList.remove('hidden');
+            loginSuccess.classList.add('hidden');
+            mainApp.classList.remove('active');
         }
-      });
-      if (!found) {
-        alert('❌ No update found with code: ' + query);
-      }
-    });
 
-    newsSearchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') newsSearchBtn.click();
-    });
-
-    // ===== ERROR HANDLER =====
-    errorHomeBtn.addEventListener('click', () => {
-      window.location.href = '/';
-    });
-
-    logoutBtn.addEventListener('click', logout);
-
-    // ===== FANTASY BACKGROUND =====
-    (function initFantasy() {
-      const bg = document.getElementById('fantasyBg');
-      const emojis = ['🍃', '🌿', '🍂', '🌱'];
-      for (let i = 0; i < 25; i++) {
-        const el = document.createElement('div');
-        el.className = 'leaf-bg';
-        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-        el.style.left = Math.random() * 100 + '%';
-        el.style.fontSize = (1.5 + Math.random() * 3) + 'rem';
-        el.style.animationDuration = (20 + Math.random() * 40) + 's';
-        el.style.animationDelay = (Math.random() * 30) + 's';
-        bg.appendChild(el);
-      }
-      for (let i = 0; i < 50; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle-bg';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.top = Math.random() * 100 + '%';
-        p.style.width = (2 + Math.random() * 5) + 'px';
-        p.style.height = p.style.width;
-        p.style.animationDelay = (Math.random() * 8) + 's';
-        p.style.animationDuration = (3 + Math.random() * 6) + 's';
-        bg.appendChild(p);
-      }
-    })();
-
-    // ===== INIT =====
-    async function init() {
-      const path = window.location.pathname;
-      const match = path.match(/^\/link\/(.+)$/);
-
-      if (match) {
-        await attemptLoginWithCode(match[1].trim());
-        return;
-      }
-
-      // Check if it's a page route
-      const pageMatch = path.match(/^\/(\w+)$/);
-      if (pageMatch && pageMatch[1] !== '') {
-        const page = pageMatch[1];
-        const link = document.querySelector(`[data-page="${page}"]`);
-        if (link) {
-          document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-          link.classList.add('active');
-          document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-          const target = document.getElementById('page-' + page);
-          if (target) target.classList.add('active');
+        // Show verifying message
+        function showVerifyingMessage() {
+            const authMessage = document.getElementById('authMessage');
+            authMessage.innerHTML = '<p>WE ARE VERIFYING YOUR IDENTITY, PLEASE WAIT...</p>';
         }
-      }
 
-      // Validate session
-      await validateSession();
-    }
-
-    init();
-
-    // Handle browser back/forward
-    window.addEventListener('popstate', () => {
-      const path = window.location.pathname;
-      const pageMatch = path.match(/^\/(\w+)$/);
-      if (pageMatch) {
-        const page = pageMatch[1];
-        const link = document.querySelector(`[data-page="${page}"]`);
-        if (link) {
-          document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-          link.classList.add('active');
-          document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-          const target = document.getElementById('page-' + page);
-          if (target) target.classList.add('active');
+        // Show login success
+        function showLoginSuccess() {
+            authScreen.classList.add('hidden');
+            loginSuccess.classList.remove('hidden');
+            createParticles();
         }
-      }
-    });
-  </script>
+
+        // Create particles effect
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            particlesContainer.innerHTML = '';
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.setProperty('--tx', `${(Math.random() - 0.5) * 300}px`);
+                particle.style.setProperty('--ty', `${(Math.random() - 0.5) * 300}px`);
+                particle.style.animationDelay = `${Math.random() * 0.5}s`;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Show main app
+        function showMainApp() {
+            authScreen.classList.add('hidden');
+            loginSuccess.classList.add('hidden');
+            mainApp.classList.add('active');
+            handleRouting();
+        }
+
+        // Load user data
+        async function loadUserData(user) {
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    
+                    // Update profile
+                    document.getElementById('userAvatar').src = userData.avatar || 'https://via.placeholder.com/150/6c5ce7/ffffff?text=W';
+                    document.getElementById('leafBalance').textContent = userData.leaf || 0;
+                    document.getElementById('lumenBalance').textContent = userData.lumen || 0;
+                    document.getElementById('tokenBalance').textContent = userData.websiteToken || 0;
+                    document.getElementById('infoUsername').textContent = userData.username || user.email;
+                    document.getElementById('infoUserId').textContent = user.uid;
+                    document.getElementById('infoJoinDate').textContent = userData.joinDate || new Date().toLocaleDateString();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        // Handle routing
+        function handleRouting() {
+            const path = window.location.pathname;
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (path === '/profile' || path === '/profile/info') {
+                document.querySelector('[data-tab="profile"]').classList.add('active');
+                document.getElementById('profileTab').classList.add('active');
+                
+                if (path === '/profile/info') {
+                    profileInfo.classList.add('active');
+                    infoToggle.textContent = 'your information 🔽';
+                }
+            } else if (path === '/shop' || path === '/shop/lumentop' || path === '/shop/leafiop') {
+                document.querySelector('[data-tab="shop"]').classList.add('active');
+                document.getElementById('shopTab').classList.add('active');
+            } else if (path === '/earn') {
+                document.querySelector('[data-tab="earn"]').classList.add('active');
+                document.getElementById('earnTab').classList.add('active');
+            } else {
+                // Default to news
+                document.querySelector('[data-tab="news"]').classList.add('active');
+                document.getElementById('newsTab').classList.add('active');
+                loadNews();
+            }
+        }
+
+        // Load news
+        async function loadNews() {
+            try {
+                const newsSnapshot = await getDocs(collection(db, 'news'));
+                newsList.innerHTML = '';
+                
+                newsSnapshot.forEach(doc => {
+                    const news = doc.data();
+                    const newsItem = document.createElement('div');
+                    newsItem.className = 'news-item';
+                    newsItem.innerHTML = `
+                        <h3>${news.title || 'Update'}</h3>
+                        <p>${news.description || ''}</p>
+                        <span class="news-code">${news.code || doc.id}</span>
+                    `;
+                    newsList.appendChild(newsItem);
+                });
+            } catch (error) {
+                console.error('Error loading news:', error);
+                newsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No news available</p>';
+            }
+        }
+
+        // Search news
+        async function searchNews() {
+            const code = newsSearch.value.trim();
+            if (!code) return;
+            
+            try {
+                const q = query(collection(db, 'news'), where('code', '==', code));
+                const querySnapshot = await getDocs(q);
+                
+                newsList.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    newsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No news found with this code</p>';
+                    return;
+                }
+                
+                querySnapshot.forEach(doc => {
+                    const news = doc.data();
+                    const newsItem = document.createElement('div');
+                    newsItem.className = 'news-item';
+                    newsItem.innerHTML = `
+                        <h3>${news.title || 'Update'}</h3>
+                        <p>${news.description || ''}</p>
+                        <span class="news-code">${news.code || doc.id}</span>
+                    `;
+                    newsList.appendChild(newsItem);
+                });
+            } catch (error) {
+                console.error('Error searching news:', error);
+            }
+        }
+
+        // Event listeners
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        });
+
+        infoToggle.addEventListener('click', () => {
+            profileInfo.classList.toggle('active');
+            if (profileInfo.classList.contains('active')) {
+                infoToggle.textContent = 'your information 🔽';
+                window.history.pushState({}, '', '/profile/info');
+            } else {
+                infoToggle.textContent = 'your information 🔼';
+                window.history.pushState({}, '', '/profile');
+            }
+        });
+
+        searchBtn.addEventListener('click', searchNews);
+        newsSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchNews();
+        });
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', handleRouting);
+
+        // Handle tab clicks
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabName = tab.getAttribute('data-tab');
+                window.history.pushState({}, '', tab.getAttribute('href'));
+                handleRouting();
+            });
+        });
+    </script>
 </body>
 </html>
