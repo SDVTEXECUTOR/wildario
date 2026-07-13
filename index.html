@@ -24,6 +24,7 @@
             --border: #2d2d3d;
             --success: #00b894;
             --danger: #e17055;
+            --warning: #fdcb6e;
             --glow: rgba(108, 92, 231, 0.4);
         }
 
@@ -58,6 +59,8 @@
         .auth-container {
             text-align: center;
             animation: fadeIn 0.8s ease;
+            max-width: 600px;
+            padding: 2rem;
         }
 
         .wildoria-logo {
@@ -98,8 +101,6 @@
         }
 
         .auth-message {
-            max-width: 600px;
-            margin: 0 auto;
             padding: 2rem;
             background: var(--bg-card);
             border-radius: 15px;
@@ -119,6 +120,41 @@
             padding: 0.2rem 0.5rem;
             background: rgba(108, 92, 231, 0.1);
             border-radius: 5px;
+        }
+
+        .auth-message.error {
+            border-color: var(--danger);
+            background: rgba(225, 112, 85, 0.1);
+            animation: shake 0.5s ease;
+        }
+
+        .auth-message.error p {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        .auth-message.success {
+            border-color: var(--success);
+            background: rgba(0, 184, 148, 0.1);
+        }
+
+        .auth-message.success p {
+            color: var(--success);
+        }
+
+        .auth-message.warning {
+            border-color: var(--warning);
+            background: rgba(253, 203, 110, 0.1);
+        }
+
+        .auth-message.warning p {
+            color: var(--warning);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
 
         /* ===== LOGIN SUCCESS ===== */
@@ -232,6 +268,8 @@
             top: 0;
             z-index: 100;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .header-logo {
@@ -247,6 +285,7 @@
         .nav-tabs {
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .nav-tab {
@@ -313,6 +352,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .tab-header h2 {
@@ -324,6 +365,7 @@
         .search-container {
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .search-input {
@@ -401,6 +443,16 @@
             margin-top: 1rem;
         }
 
+        .news-date {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 206, 201, 0.2);
+            border-radius: 5px;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+        }
+
         /* ===== PROFILE TAB ===== */
         .profile-container {
             max-width: 800px;
@@ -434,6 +486,8 @@
             align-items: center;
             padding: 1rem 0;
             border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .stat-item:last-child {
@@ -617,17 +671,6 @@
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-tabs {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .tab-header {
-                flex-direction: column;
-                gap: 1rem;
             }
 
             .search-input {
@@ -637,10 +680,62 @@
             .shop-items {
                 grid-template-columns: 1fr;
             }
+
+            .wildoria-logo {
+                font-size: 2rem;
+            }
+
+            .success-text {
+                font-size: 2rem;
+            }
+
+            .stat-label {
+                min-width: 100%;
+            }
         }
 
         .hidden {
             display: none !important;
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+        }
+
+        .toast.success {
+            border-color: var(--success);
+            background: rgba(0, 184, 148, 0.1);
+            color: var(--success);
+        }
+
+        .toast.error {
+            border-color: var(--danger);
+            background: rgba(225, 112, 85, 0.1);
+            color: var(--danger);
+        }
+
+        .toast.warning {
+            border-color: var(--warning);
+            background: rgba(253, 203, 110, 0.1);
+            color: var(--warning);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
@@ -720,7 +815,9 @@
                     <div id="profileInfo" class="profile-info">
                         <div class="info-content">
                             <p><strong>Username:</strong> <span id="infoUsername">-</span></p>
-                            <p><strong>User ID:</strong> <span id="infoUserId">-</span></p>
+                            <p><strong>Display Name:</strong> <span id="infoDisplayName">-</span></p>
+                            <p><strong>Player ID:</strong> <span id="infoPlayerId">-</span></p>
+                            <p><strong>Wildoria ID:</strong> <span id="infoWildoriaId">-</span></p>
                             <p><strong>Join Date:</strong> <span id="infoJoinDate">-</span></p>
                             <p><strong>Status:</strong> <span class="status-active">Active</span></p>
                         </div>
@@ -764,8 +861,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -782,8 +878,7 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = getDatabase(app);
 
         // DOM Elements
         const authScreen = document.getElementById('authScreen');
@@ -795,63 +890,184 @@
         const newsSearch = document.getElementById('newsSearch');
         const searchBtn = document.getElementById('searchBtn');
         const newsList = document.getElementById('newsList');
+        const authMessage = document.getElementById('authMessage');
+
+        // Current user session
+        let currentUser = null;
 
         // Check URL for login code
         const path = window.location.pathname;
         const isLoginLink = path.startsWith('/link/');
-        const loginCode = isLoginLink ? path.split('/link/')[1] : null;
+        const loginToken = isLoginLink ? decodeURIComponent(path.substring('/link/'.length)) : null;
 
-        // Handle login link
-        if (isLoginLink && loginCode) {
-            handleLoginWithCode(loginCode);
-        }
-
-        // Auth state listener
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // User is logged in
-                if (!isLoginLink) {
+        // Initialize app
+        async function initApp() {
+            // Check if there's an active session
+            const savedWildoriaId = localStorage.getItem('wildoria_id');
+            const savedToken = localStorage.getItem('wildoria_token');
+            
+            if (savedWildoriaId && savedToken) {
+                // Try to restore session
+                const sessionValid = await validateSession(savedWildoriaId, savedToken);
+                if (sessionValid) {
                     showMainApp();
-                    await loadUserData(user);
-                }
-            } else {
-                // User is not logged in
-                if (!isLoginLink) {
-                    showAuthScreen();
+                    return;
+                } else {
+                    // Session invalid, clear it
+                    localStorage.removeItem('wildoria_id');
+                    localStorage.removeItem('wildoria_token');
                 }
             }
-        });
 
-        // Handle login with code
-        async function handleLoginWithCode(code) {
+            // Check if this is a login link
+            if (isLoginLink && loginToken) {
+                await handleLoginWithToken(loginToken);
+            } else {
+                // No session, no login link - show auth screen
+                showAuthScreen();
+            }
+        }
+
+        // Handle login with token
+        async function handleLoginWithToken(token) {
             showVerifyingMessage();
             
             try {
-                // Check if code exists in Firebase
-                const codeDoc = await getDoc(doc(db, 'loginCodes', code));
+                // Find the token in linkTokens
+                const linkTokensRef = ref(db, 'linkTokens');
+                const snapshot = await get(linkTokensRef);
                 
-                if (codeDoc.exists()) {
-                    const codeData = codeDoc.data();
-                    
-                    // Simulate authentication (in real app, you'd use Firebase Auth)
-                    // For demo, we'll create a custom token or use email/password
-                    // Here we'll just show success and redirect
-                    
-                    setTimeout(() => {
-                        showLoginSuccess();
-                        setTimeout(() => {
-                            window.location.href = '/';
-                        }, 2000);
-                    }, 1500);
-                } else {
-                    // Invalid code
-                    setTimeout(() => {
-                        showAuthScreen();
-                    }, 1500);
+                if (!snapshot.exists()) {
+                    showError('❌ INVALID LINK! No login tokens found. Please create a new link from the game.');
+                    return;
                 }
+
+                const linkTokens = snapshot.val();
+                let tokenData = null;
+                let tokenKey = null;
+
+                // Find the matching token
+                for (const key in linkTokens) {
+                    if (linkTokens[key].token === token || key === token) {
+                        tokenData = linkTokens[key];
+                        tokenKey = key;
+                        break;
+                    }
+                }
+
+                if (!tokenData) {
+                    showError('❌ INVALID LINK! This link does not exist. Please create a new link from the game.');
+                    return;
+                }
+
+                // Check if token has been used
+                if (tokenData.used === true) {
+                    showError('❌ LINK ALREADY USED! This link has already been used. Please create a new link from the game.');
+                    return;
+                }
+
+                // Check if token has expired
+                const now = Math.floor(Date.now() / 1000); // Current time in seconds
+                if (tokenData.expiresAt && now > tokenData.expiresAt) {
+                    const expiredTime = new Date(tokenData.expiresAt * 1000).toLocaleString();
+                    showError(`❌ LINK EXPIRED! This link expired at ${expiredTime}. Please create a new link from the game.`);
+                    return;
+                }
+
+                // Token is valid - create session
+                const wildoriaId = tokenData.wildoriaId;
+                
+                // Mark token as used and logged in
+                const tokenRef = ref(db, `linkTokens/${tokenKey}`);
+                await update(tokenRef, { 
+                    used: true, 
+                    loggedIn: true,
+                    usedAt: now
+                });
+
+                // Save user data to users collection
+                const userRef = ref(db, `users/${wildoriaId}`);
+                await set(userRef, {
+                    playerId: tokenData.playerId,
+                    username: tokenData.username,
+                    displayName: tokenData.displayName,
+                    avatar: tokenData.avatar,
+                    leaf: tokenData.Leaf || 0,
+                    lumen: tokenData.Lumen || 0,
+                    websiteToken: 0,
+                    wildoriaId: wildoriaId,
+                    joinDate: tokenData.createdAt,
+                    lastLogin: now,
+                    activeToken: tokenData.token
+                });
+
+                // Save session to localStorage
+                localStorage.setItem('wildoria_id', wildoriaId);
+                localStorage.setItem('wildoria_token', tokenData.token);
+                localStorage.setItem('wildoria_playerId', tokenData.playerId);
+
+                // Set current user
+                currentUser = {
+                    wildoriaId: wildoriaId,
+                    playerId: tokenData.playerId,
+                    username: tokenData.username,
+                    displayName: tokenData.displayName,
+                    avatar: tokenData.avatar,
+                    leaf: tokenData.Leaf || 0,
+                    lumen: tokenData.Lumen || 0,
+                    websiteToken: 0,
+                    joinDate: tokenData.createdAt
+                };
+
+                // Show success
+                showLoginSuccess();
+                
+                // Redirect to main app after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+
             } catch (error) {
                 console.error('Login error:', error);
-                showAuthScreen();
+                showError('❌ ERROR! An error occurred during login. Please try again.');
+            }
+        }
+
+        // Validate session
+        async function validateSession(wildoriaId, token) {
+            try {
+                const userRef = ref(db, `users/${wildoriaId}`);
+                const snapshot = await get(userRef);
+
+                if (!snapshot.exists()) return false;
+
+                const userData = snapshot.val();
+                
+                // Check if the active token matches
+                if (userData.activeToken !== token) return false;
+
+                // Update last login
+                const now = Math.floor(Date.now() / 1000);
+                await update(userRef, { lastLogin: now });
+
+                // Set current user
+                currentUser = {
+                    wildoriaId: wildoriaId,
+                    playerId: userData.playerId,
+                    username: userData.username,
+                    displayName: userData.displayName,
+                    avatar: userData.avatar,
+                    leaf: userData.leaf || 0,
+                    lumen: userData.lumen || 0,
+                    websiteToken: userData.websiteToken || 0,
+                    joinDate: userData.joinDate
+                };
+
+                return true;
+
+            } catch (error) {
+                console.error('Session validation error:', error);
+                return false;
             }
         }
 
@@ -860,12 +1076,21 @@
             authScreen.classList.remove('hidden');
             loginSuccess.classList.add('hidden');
             mainApp.classList.remove('active');
+            authMessage.className = 'auth-message';
+            authMessage.innerHTML = '<p>PLEASE GO TO GAME, CLICK <span class="highlight">{CODE}</span> BUTTON TO CREATE LINK, GO TO CHROME... TO PASTE THAT LINK AND LOGIN</p>';
         }
 
         // Show verifying message
         function showVerifyingMessage() {
-            const authMessage = document.getElementById('authMessage');
-            authMessage.innerHTML = '<p>WE ARE VERIFYING YOUR IDENTITY, PLEASE WAIT...</p>';
+            authMessage.className = 'auth-message';
+            authMessage.innerHTML = '<p>🔍 WE ARE VERIFYING YOUR IDENTITY, PLEASE WAIT...</p>';
+        }
+
+        // Show error message
+        function showError(message) {
+            authMessage.className = 'auth-message error';
+            authMessage.innerHTML = `<p>${message}</p>`;
+            showToast(message, 'error');
         }
 
         // Show login success
@@ -873,6 +1098,7 @@
             authScreen.classList.add('hidden');
             loginSuccess.classList.remove('hidden');
             createParticles();
+            showToast('✅ LOGIN SUCCESSFUL!', 'success');
         }
 
         // Create particles effect
@@ -880,44 +1106,54 @@
             const particlesContainer = document.getElementById('particles');
             particlesContainer.innerHTML = '';
             
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
-                particle.style.setProperty('--tx', `${(Math.random() - 0.5) * 300}px`);
-                particle.style.setProperty('--ty', `${(Math.random() - 0.5) * 300}px`);
+                particle.style.setProperty('--tx', `${(Math.random() - 0.5) * 400}px`);
+                particle.style.setProperty('--ty', `${(Math.random() - 0.5) * 400}px`);
                 particle.style.animationDelay = `${Math.random() * 0.5}s`;
+                particle.style.background = ['#00b894', '#55efc4', '#6c5ce7', '#00cec9'][Math.floor(Math.random() * 4)];
                 particlesContainer.appendChild(particle);
             }
         }
 
         // Show main app
-        function showMainApp() {
+        async function showMainApp() {
             authScreen.classList.add('hidden');
             loginSuccess.classList.add('hidden');
             mainApp.classList.add('active');
+            
+            // Load user data
+            await loadUserData();
+            
+            // Handle routing
             handleRouting();
         }
 
         // Load user data
-        async function loadUserData(user) {
+        async function loadUserData() {
+            if (!currentUser) return;
+
             try {
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    
-                    // Update profile
-                    document.getElementById('userAvatar').src = userData.avatar || 'https://via.placeholder.com/150/6c5ce7/ffffff?text=W';
-                    document.getElementById('leafBalance').textContent = userData.leaf || 0;
-                    document.getElementById('lumenBalance').textContent = userData.lumen || 0;
-                    document.getElementById('tokenBalance').textContent = userData.websiteToken || 0;
-                    document.getElementById('infoUsername').textContent = userData.username || user.email;
-                    document.getElementById('infoUserId').textContent = user.uid;
-                    document.getElementById('infoJoinDate').textContent = userData.joinDate || new Date().toLocaleDateString();
-                }
+                // Update profile
+                document.getElementById('userAvatar').src = currentUser.avatar || 'https://via.placeholder.com/150/6c5ce7/ffffff?text=W';
+                document.getElementById('leafBalance').textContent = formatNumber(currentUser.leaf);
+                document.getElementById('lumenBalance').textContent = formatNumber(currentUser.lumen);
+                document.getElementById('tokenBalance').textContent = formatNumber(currentUser.websiteToken);
+                document.getElementById('infoUsername').textContent = currentUser.username || 'Unknown';
+                document.getElementById('infoDisplayName').textContent = currentUser.displayName || 'Unknown';
+                document.getElementById('infoPlayerId').textContent = currentUser.playerId || '-';
+                document.getElementById('infoWildoriaId').textContent = currentUser.wildoriaId || '-';
+                document.getElementById('infoJoinDate').textContent = currentUser.joinDate ? new Date(currentUser.joinDate * 1000).toLocaleDateString() : new Date().toLocaleDateString();
             } catch (error) {
                 console.error('Error loading user data:', error);
+                showToast('Error loading user data', 'error');
             }
+        }
+
+        // Format number with commas
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
         // Handle routing
@@ -953,65 +1189,122 @@
         // Load news
         async function loadNews() {
             try {
-                const newsSnapshot = await getDocs(collection(db, 'news'));
+                const newsRef = ref(db, 'news');
+                const snapshot = await get(newsRef);
                 newsList.innerHTML = '';
                 
-                newsSnapshot.forEach(doc => {
-                    const news = doc.data();
+                if (!snapshot.exists()) {
+                    newsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No news available</p>';
+                    return;
+                }
+
+                const newsData = snapshot.val();
+                const newsArray = Object.keys(newsData).map(key => ({
+                    id: key,
+                    ...newsData[key]
+                }));
+
+                // Sort by date (newest first)
+                newsArray.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                newsArray.forEach(news => {
                     const newsItem = document.createElement('div');
                     newsItem.className = 'news-item';
                     newsItem.innerHTML = `
                         <h3>${news.title || 'Update'}</h3>
                         <p>${news.description || ''}</p>
-                        <span class="news-code">${news.code || doc.id}</span>
+                        <span class="news-code">${news.code || news.id}</span>
+                        ${news.createdAt ? `<span class="news-date">${new Date(news.createdAt * 1000).toLocaleDateString()}</span>` : ''}
                     `;
                     newsList.appendChild(newsItem);
                 });
             } catch (error) {
                 console.error('Error loading news:', error);
-                newsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No news available</p>';
+                newsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Error loading news</p>';
             }
         }
 
         // Search news
         async function searchNews() {
             const code = newsSearch.value.trim();
-            if (!code) return;
+            if (!code) {
+                loadNews();
+                return;
+            }
             
             try {
-                const q = query(collection(db, 'news'), where('code', '==', code));
-                const querySnapshot = await getDocs(q);
-                
+                const newsRef = ref(db, 'news');
+                const snapshot = await get(newsRef);
                 newsList.innerHTML = '';
                 
-                if (querySnapshot.empty) {
+                if (!snapshot.exists()) {
                     newsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No news found with this code</p>';
                     return;
                 }
-                
-                querySnapshot.forEach(doc => {
-                    const news = doc.data();
+
+                const newsData = snapshot.val();
+                const matchingNews = Object.keys(newsData)
+                    .filter(key => newsData[key].code === code || key === code)
+                    .map(key => ({ id: key, ...newsData[key] }));
+
+                if (matchingNews.length === 0) {
+                    newsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No news found with this code</p>';
+                    return;
+                }
+
+                matchingNews.forEach(news => {
                     const newsItem = document.createElement('div');
                     newsItem.className = 'news-item';
                     newsItem.innerHTML = `
                         <h3>${news.title || 'Update'}</h3>
                         <p>${news.description || ''}</p>
-                        <span class="news-code">${news.code || doc.id}</span>
+                        <span class="news-code">${news.code || news.id}</span>
+                        ${news.createdAt ? `<span class="news-date">${new Date(news.createdAt * 1000).toLocaleDateString()}</span>` : ''}
                     `;
                     newsList.appendChild(newsItem);
                 });
             } catch (error) {
                 console.error('Error searching news:', error);
+                showToast('Error searching news', 'error');
             }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
         }
 
         // Event listeners
         logoutBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+
             try {
-                await signOut(auth);
-                window.location.href = '/';
+                // Update user data in Firebase
+                const userRef = ref(db, `users/${currentUser.wildoriaId}`);
+                await update(userRef, { lastLogin: Math.floor(Date.now() / 1000) });
+
+                // Clear localStorage
+                localStorage.removeItem('wildoria_id');
+                localStorage.removeItem('wildoria_token');
+                localStorage.removeItem('wildoria_playerId');
+
+                showToast('✅ Logged out successfully', 'success');
+                
+                // Redirect to home
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
             } catch (error) {
                 console.error('Logout error:', error);
+                showToast('Error logging out', 'error');
             }
         });
 
@@ -1038,11 +1331,13 @@
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
                 e.preventDefault();
-                const tabName = tab.getAttribute('data-tab');
                 window.history.pushState({}, '', tab.getAttribute('href'));
                 handleRouting();
             });
         });
+
+        // Initialize app
+        initApp();
     </script>
 </body>
 </html>
