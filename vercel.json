@@ -1,13 +1,44 @@
 {
-  "version": 2,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/link/(.*)",
-      "dest": "/link/index.html"
+      "source": "/link/:code",
+      "destination": "/index.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/newswildoria/:code",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/newswildoria/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/profile/info",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/profile",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/shop/lumentop",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/shop/leafiop",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/shop",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/earn",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -32,30 +63,9 @@
         },
         {
           "key": "Permissions-Policy",
-          "value": "geolocation=(), microphone=(), camera=()"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/link/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
+          "value": "camera=(), microphone=(), geolocation=()"
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false
+  ]
 }
